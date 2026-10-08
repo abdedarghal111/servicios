@@ -34,7 +34,6 @@ use FacturaScripts\Dinamic\Model\ServicioAT;
 use FacturaScripts\Dinamic\Model\TipoAT;
 use FacturaScripts\Dinamic\Model\TrabajoAT;
 use FacturaScripts\Dinamic\Model\User;
-use Google\Service\Connectors\Tool;
 
 /**
  * Description of EditServicioAT
@@ -274,7 +273,7 @@ class EditServicioAT extends EditController
         }
 
         $diff = strtotime($end) - strtotime($start);
-        $result = ceil($diff / 86400);
+        $result = (int)ceil($diff / 86400);
         if ($increment) {
             ++$result;
         }
@@ -408,7 +407,7 @@ class EditServicioAT extends EditController
                 $this->loadStatusWorkValues($viewName, $view);
                 $this->loadUserValues($viewName, 'user');
                 $this->loadAgentValues($viewName, 'agent');
-                
+
                 if ($view->count > 0) {
                     $this->tab($viewName)->addButton([
                         'action' => 'auto-quantity',
@@ -443,7 +442,7 @@ class EditServicioAT extends EditController
         $customValues = [];
         foreach (Agente::all() as $agent) {
             $customValues[] = [
-                'value' => $agent->codagente, 
+                'value' => $agent->codagente,
                 'title' => $agent->nombre,
                 'group' => empty($agent->fechabaja) ? Tools::trans('enabled') : Tools::trans('disabled')
             ];
@@ -475,7 +474,7 @@ class EditServicioAT extends EditController
         $customValues = [];
         foreach (User::all() as $user) {
             $customValues[] = [
-                'value' => $user->nick, 
+                'value' => $user->nick,
                 'title' => $user->nick,
                 'group' => $user->enabled ? Tools::trans('enabled') : Tools::trans('disabled')
             ];
@@ -494,7 +493,7 @@ class EditServicioAT extends EditController
         $customValues = [];
         foreach (Almacen::all() as $warehouse) {
             $customValues[] = [
-                'value' => $warehouse->codalmacen, 
+                'value' => $warehouse->codalmacen,
                 'title' => $warehouse->nombre,
                 'group' => $warehouse->activo ? Tools::trans('enabled') : Tools::trans('disabled')
             ];
