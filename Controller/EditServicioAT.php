@@ -316,6 +316,7 @@ class EditServicioAT extends EditController
             'make-delivery-note' => $this->makeDeliveryNoteAction(),
             'make-estimation' => $this->makeEstimationAction(),
             'make-invoice' => $this->makeInvoiceAction(),
+            'sort-files' => $this->sortFilesAction(),
             'unlink-file' => $this->unlinkFileAction(),
             default => parent::execPreviousAction($action),
         };
