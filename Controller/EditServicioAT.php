@@ -281,20 +281,21 @@ class EditServicioAT extends EditController
         return $result;
     }
 
-    protected function disableAllColumns(string $mainViewName, string $exclude = ''): void
+    protected function disableAllColumns(string $viewName, string $exclude = ''): void
     {
         // si no existe la vista, salimos
-        if (!isset($this->views[$mainViewName])) {
+        if (false === array_key_exists($viewName, $this->views)) {
             return;
         }
 
-        foreach ($this->views[$mainViewName]->getColumns() as $group) {
+        $view = $this->tab($viewName);
+        foreach ($view->getColumns() as $group) {
             foreach ($group->columns as $col) {
                 if ($col->name === $exclude || $col->display === 'none') {
                     continue;
                 }
 
-                $this->views[$mainViewName]->disableColumn($col->name, false, 'true');
+                $view->disableColumn($col->name, false, 'true');
             }
         }
     }
@@ -331,8 +332,8 @@ class EditServicioAT extends EditController
      */
     protected function loadData($viewName, $view)
     {
-        $mainViewName = $this->getMainViewName();
-        $idservicio = $this->getViewModelValue($mainViewName, 'idservicio');
+        $mainViewName = $this->mainTabName();
+        $idservicio = $this->mainTabModelValue('idservicio');
 
         switch ($viewName) {
             case $mainViewName:
@@ -355,9 +356,10 @@ class EditServicioAT extends EditController
                     $this->disableAllColumns('EditTrabajoAT');
 
                     // disable buttons
-                    $this->setSettings('EditTrabajoAT', 'btnDelete', false);
-                    $this->setSettings('EditTrabajoAT', 'btnNew', false);
-                    $this->setSettings('EditTrabajoAT', 'btnSave', false);
+                    $this->tab('EditTrabajoAT')
+                        ->setSettings('btnDelete', false)
+                        ->setSettings('btnNew', false)
+                        ->setSettings('btnSave', false);
                 }
 
                 // si no hay tipo, ocultamos el campo
@@ -391,9 +393,9 @@ class EditServicioAT extends EditController
                 // Remove checks if the service has no categories and checks.
                 if (
                     $viewName === 'EditServicioCheckAT'
-                    && isset($this->views['EditServicioCategoriaAT'])
-                    && $this->views['EditServicioCategoriaAT']->count === 0
-                    && $this->views['EditServicioCheckAT']->count === 0
+                    && array_key_exists('EditServicioCategoriaAT', $this->views)
+                    && $this->tab('EditServicioCategoriaAT')->count === 0
+                    && $view->count === 0
                 ) {
                     unset($this->views['EditServicioCheckAT']);
                 }
@@ -416,8 +418,8 @@ class EditServicioAT extends EditController
                 }
 
                 if (false === $view->model->exists()) {
-                    $view->model->codagente = $this->getViewModelValue($mainViewName, 'codagente');
-                    $view->model->nick = $this->getViewModelValue($mainViewName, 'nick');
+                    $view->model->codagente = $this->mainTabModelValue('codagente');
+                    $view->model->nick = $this->mainTabModelValue('nick');
                 }
 
                 break;
@@ -452,7 +454,7 @@ class EditServicioAT extends EditController
 
     protected function loadStatusWorkValues(string $viewName, BaseView $view): void
     {
-        $column = $this->views[$viewName]->columnForName('action');
+        $column = $this->tab($viewName)->columnForName('action');
         if ($column && $column->widget->getType() === 'select') {
             $statuses = [];
             foreach ($view->model->getAvailableStatus() as $key => $value) {
