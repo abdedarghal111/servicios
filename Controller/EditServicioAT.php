@@ -89,11 +89,25 @@ class EditServicioAT extends EditController
         if (false === $this->permissions->allowUpdate) {
             Tools::log()->warning('not-allowed-modify');
             return true;
+        } elseif (false === $this->validateFormToken()) {
+            return true;
         }
 
         $model = new TrabajoAT();
-        $code = $this->request->request->get('code', '');
+        $code = $this->request->input('code', '');
         if (false === $model->load($code)) {
+            Tools::log()->warning('record-not-found');
+            return true;
+        }
+
+        // comprobamos que el usuario puede modificar el servicio del trabajo
+        $service = new ServicioAT();
+        if (
+            false === $service->load($model->idservicio)
+            || false === $this->checkOwnerData($service)
+            || false === $service->editable
+        ) {
+            Tools::log()->warning('not-allowed-modify');
             return true;
         }
 
