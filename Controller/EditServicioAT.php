@@ -187,7 +187,7 @@ class EditServicioAT extends EditController
             ->setSettings('btnNew', false)
             ->setSettings('checkBoxes', false);
 
-        $this->addButton($viewName, [
+        $this->tab($viewName)->addButton([
             'action' => 'make-delivery-note',
             'color' => 'warning',
             'confirm' => true,
@@ -210,7 +210,7 @@ class EditServicioAT extends EditController
             ->setSettings('btnNew', false)
             ->setSettings('checkBoxes', false);
 
-        $this->addButton($viewName, [
+        $this->tab($viewName)->addButton([
             'action' => 'make-estimation',
             'color' => 'warning',
             'confirm' => true,
@@ -233,7 +233,7 @@ class EditServicioAT extends EditController
             ->setSettings('btnNew', false)
             ->setSettings('checkBoxes', false);
 
-        $this->addButton($viewName, [
+        $this->tab($viewName)->addButton([
             'action' => 'make-invoice',
             'color' => 'warning',
             'confirm' => true,
@@ -366,7 +366,7 @@ class EditServicioAT extends EditController
                     $view->disableColumn('type');
                 }
 
-                $this->addButton($viewName, [
+                $this->tab($viewName)->addButton([
                     'action' => 'CopyModel?model=' . $this->getModelClassName() . '&code=' . $view->model->id(),
                     'icon' => 'fa-solid fa-cut',
                     'label' => 'copy',
@@ -408,7 +408,7 @@ class EditServicioAT extends EditController
                 $this->loadAgentValues($viewName, 'agent');
                 
                 if ($view->count > 0) {
-                    $this->addButton('EditTrabajoAT', [
+                    $this->tab($viewName)->addButton([
                         'action' => 'auto-quantity',
                         'icon' => 'fa-solid fa-calculator',
                         'label' => 'calculate-hours'
