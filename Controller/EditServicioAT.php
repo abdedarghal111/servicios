@@ -502,14 +502,8 @@ class EditServicioAT extends EditController
 
     protected function makeDeliveryNoteAction(): bool
     {
-        if (false === $this->permissions->allowUpdate) {
-            Tools::log()->warning('not-allowed-modify');
-            return true;
-        }
-
-        $service = new ServicioAT();
-        $code = $this->request->get('code', '');
-        if (false === $service->load($code) || false === $service->editable) {
+        $service = $this->loadServiceToGenerate();
+        if (null === $service) {
             return true;
         }
 
@@ -524,14 +518,8 @@ class EditServicioAT extends EditController
 
     protected function makeEstimationAction(): bool
     {
-        if (false === $this->permissions->allowUpdate) {
-            Tools::log()->warning('not-allowed-modify');
-            return true;
-        }
-
-        $service = new ServicioAT();
-        $code = $this->request->get('code', '');
-        if (false === $service->load($code) || false === $service->editable) {
+        $service = $this->loadServiceToGenerate();
+        if (null === $service) {
             return true;
         }
 
@@ -546,14 +534,8 @@ class EditServicioAT extends EditController
 
     protected function makeInvoiceAction(): bool
     {
-        if (false === $this->permissions->allowUpdate) {
-            Tools::log()->warning('not-allowed-modify');
-            return true;
-        }
-
-        $service = new ServicioAT();
-        $code = $this->request->get('code', '');
-        if (false === $service->load($code) || false === $service->editable) {
+        $service = $this->loadServiceToGenerate();
+        if (null === $service) {
             return true;
         }
 
@@ -564,6 +546,36 @@ class EditServicioAT extends EditController
 
         Tools::log()->notice('record-updated-correctly');
         return true;
+    }
+
+    /**
+     * Comprueba permisos y token, y devuelve el servicio sobre el que generar
+     * el documento, o null si no se puede continuar.
+     *
+     * @return ServicioAT|null
+     */
+    protected function loadServiceToGenerate(): ?ServicioAT
+    {
+        if (false === $this->permissions->allowUpdate) {
+            Tools::log()->warning('not-allowed-modify');
+            return null;
+        } elseif (false === $this->validateFormToken()) {
+            return null;
+        }
+
+        $service = new ServicioAT();
+        $code = $this->request->queryOrInput('code', '');
+        if (false === $service->load($code)) {
+            Tools::log()->warning('record-not-found');
+            return null;
+        }
+
+        if (false === $this->checkOwnerData($service) || false === $service->editable) {
+            Tools::log()->warning('not-allowed-modify');
+            return null;
+        }
+
+        return $service;
     }
 
     /**
